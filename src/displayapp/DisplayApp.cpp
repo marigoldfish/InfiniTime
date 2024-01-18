@@ -251,6 +251,9 @@ void DisplayApp::Refresh() {
         state = States::Idle;
         break;
       case Messages::GoToRunning:
+        if (currentApp == Apps::Launcher || currentApp == Apps::QuickSettings || currentApp == Apps::Settings || currentApp == Apps::Notifications) {
+          LoadScreen(Apps::Clock, DisplayApp::FullRefreshDirections::None);
+        }
         lcd.Wakeup();
         lv_disp_trig_activity(nullptr);
         ApplyBrightness();
