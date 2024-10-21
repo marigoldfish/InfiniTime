@@ -13,21 +13,24 @@
 #include "displayapp/screens/ApplicationList.h"
 #include "displayapp/screens/FirmwareUpdate.h"
 #include "displayapp/screens/FirmwareValidation.h"
-#include "displayapp/screens/InfiniPaint.h"
-#include "displayapp/screens/Paddle.h"
+//#include "displayapp/screens/InfiniPaint.h"
+//#include "displayapp/screens/Paddle.h"
 #include "displayapp/screens/StopWatch.h"
-#include "displayapp/screens/Metronome.h"
+//#include "displayapp/screens/Metronome.h"
 #include "displayapp/screens/Music.h"
 #include "displayapp/screens/Navigation.h"
+#include "displayapp/screens/Calendar.h"
+#include "displayapp/screens/Calculator.h"
 #include "displayapp/screens/Notifications.h"
 #include "displayapp/screens/SystemInfo.h"
 #include "displayapp/screens/Tile.h"
 #include "displayapp/screens/Twos.h"
+#include "displayapp/screens/Bird.h"
 #include "displayapp/screens/FlashLight.h"
 #include "displayapp/screens/BatteryInfo.h"
 #include "displayapp/screens/Steps.h"
-#include "displayapp/screens/Dice.h"
 #include "displayapp/screens/Weather.h"
+//#include "displayapp/screens/Dice.h"
 #include "displayapp/screens/PassKey.h"
 #include "displayapp/screens/Error.h"
 
@@ -285,6 +288,7 @@ void DisplayApp::Refresh() {
   if (xQueueReceive(msgQueue, &msg, queueTimeout) == pdTRUE) {
     switch (msg) {
       case Messages::GoToSleep:
+<<<<<<< HEAD
         if (state != States::Running) {
           break;
         }
@@ -315,6 +319,10 @@ void DisplayApp::Refresh() {
         } else {
           lcd.Sleep();
         }
+=======
+        brightnessController.Set(Controllers::BrightnessController::Levels::Off);
+        lcd.Sleep();
+>>>>>>> main
         PushMessageToSystemTask(Pinetime::System::Messages::OnDisplayTaskSleeping);
         state = States::Idle;
         break;
@@ -322,6 +330,7 @@ void DisplayApp::Refresh() {
         lv_disp_trig_activity(nullptr);
         break;
       case Messages::GoToRunning:
+<<<<<<< HEAD
         if (state == States::Running) {
           break;
         }
@@ -330,6 +339,12 @@ void DisplayApp::Refresh() {
         } else {
           lcd.Wakeup();
         }
+=======
+        if (currentApp == Apps::Launcher || currentApp == Apps::QuickSettings || currentApp == Apps::Settings || currentApp == Apps::Notifications) {
+          LoadScreen(Apps::Clock, DisplayApp::FullRefreshDirections::None);
+        }
+        lcd.Wakeup();
+>>>>>>> main
         lv_disp_trig_activity(nullptr);
         ApplyBrightness();
         state = States::Running;
@@ -442,8 +457,8 @@ void DisplayApp::Refresh() {
         LoadNewScreen(Apps::SysInfo, DisplayApp::FullRefreshDirections::Up);
         break;
       case Messages::ButtonDoubleClicked:
-        if (currentApp != Apps::Notifications && currentApp != Apps::NotificationsPreview) {
-          LoadNewScreen(Apps::Notifications, DisplayApp::FullRefreshDirections::Down);
+        if (currentApp != Apps::Navigation) {
+          LoadNewScreen(Apps::Navigation, DisplayApp::FullRefreshDirections::None);
         }
         break;
 
@@ -458,7 +473,21 @@ void DisplayApp::Refresh() {
         motorController.RunForDuration(35);
         break;
       case Messages::OnChargingEvent:
+<<<<<<< HEAD
         motorController.RunForDuration(15);
+=======
+        RestoreBrightness();
+        if (batteryController.IsCharging() && currentApp == Apps::Clock) {
+          // Open the battery app if on the clock screen
+          LoadNewScreen(Apps::BatteryInfo, DisplayApp::FullRefreshDirections::None);
+        } else if (!batteryController.IsCharging() && currentApp == Apps::BatteryInfo) {
+          // Close the battery app after being unplugged
+          LoadNewScreen(Apps::Clock, DisplayApp::FullRefreshDirections::None);
+        } else {
+          // Vibrate normally otherwise as to not close any open app
+          motorController.RunForDuration(15);
+        }
+>>>>>>> main
         break;
     }
   }
@@ -496,6 +525,8 @@ void DisplayApp::LoadScreen(Apps app, DisplayApp::FullRefreshDirections directio
 
   currentScreen.reset(nullptr);
   SetFullRefresh(direction);
+
+  brightnessController.Set(settingsController.GetBrightness());
 
   switch (app) {
     case Apps::Launcher: {

@@ -107,6 +107,7 @@ void Timer::UpdateMask() {
 
 void Timer::Refresh() {
   if (isRinging) {
+<<<<<<< HEAD
     DisplayTime();
     // Stop buzzing after 10 seconds, but continue the counter
     if (motorController.IsRinging() && displaySeconds.Get().count() > 10) {
@@ -118,6 +119,23 @@ void Timer::Refresh() {
     }
   } else if (timer.IsRunning()) {
     DisplayTime();
+=======
+    auto secondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(timer.GetTimeRemaining());
+    minuteCounter.SetValue(secondsElapsed.count() / 60);
+    secondCounter.SetValue(secondsElapsed.count() % 60);
+    // Stop buzzing after 10 seconds, but continue the counter
+    if (motorController.IsRinging() && secondsElapsed.count() > 10) {
+      motorController.StopRinging();
+    }
+    // Reset timer after 1 minute
+    if (secondsElapsed.count() > 60) {
+      Reset();
+    }
+  } else if (timer.IsRunning()) {
+    auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(timer.GetTimeRemaining());
+    minuteCounter.SetValue(secondsRemaining.count() / 60);
+    secondCounter.SetValue(secondsRemaining.count() % 60);
+>>>>>>> main
   } else if (buttonPressing && xTaskGetTickCount() > pressTime + pdMS_TO_TICKS(150)) {
     lv_label_set_text_static(txtPlayPause, "Reset");
     maskPosition += 15;
@@ -159,7 +177,13 @@ void Timer::SetTimerRinging() {
   secondCounter.HideControls();
   lv_label_set_text_static(txtPlayPause, "Reset");
   lv_obj_set_style_local_bg_color(btnPlayPause, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+<<<<<<< HEAD
   timer.SetExpiredTime();
+=======
+  if (ringTime == 0) {
+    ringTime = xTaskGetTickCount();
+  }
+>>>>>>> main
 }
 
 void Timer::ToggleRunning() {
@@ -167,7 +191,13 @@ void Timer::ToggleRunning() {
     motorController.StopRinging();
     Reset();
   } else if (timer.IsRunning()) {
+<<<<<<< HEAD
     DisplayTime();
+=======
+    auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(timer.GetTimeRemaining());
+    minuteCounter.SetValue(secondsRemaining.count() / 60);
+    secondCounter.SetValue(secondsRemaining.count() % 60);
+>>>>>>> main
     timer.StopTimer();
     SetTimerStopped();
   } else if (secondCounter.GetValue() + minuteCounter.GetValue() > 0) {

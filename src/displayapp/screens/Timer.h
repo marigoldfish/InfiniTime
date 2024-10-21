@@ -49,7 +49,11 @@ namespace Pinetime::Applications {
       bool isRinging = false;
       lv_coord_t maskPosition = 0;
       TickType_t pressTime = 0;
+<<<<<<< HEAD
       Utility::DirtyValue<std::chrono::seconds> displaySeconds;
+=======
+      TickType_t ringTime = 0;
+>>>>>>> main
     };
   }
 

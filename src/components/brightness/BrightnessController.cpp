@@ -2,7 +2,12 @@
 #include <hal/nrf_gpio.h>
 #include "displayapp/screens/Symbols.h"
 #include "drivers/PinMap.h"
+<<<<<<< HEAD
 #include <libraries/delay/nrf_delay.h>
+=======
+#include "nrf_pwm.h"
+
+>>>>>>> main
 using namespace Pinetime::Controllers;
 
 namespace {
@@ -19,6 +24,7 @@ void BrightnessController::Init() {
   nrf_gpio_pin_clear(PinMap::LcdBacklightMedium);
   nrf_gpio_pin_clear(PinMap::LcdBacklightHigh);
 
+<<<<<<< HEAD
   static_assert(timerFrequency == 32768, "Change the prescaler below");
   RTC->PRESCALER = 0;
   // CC1 switches the backlight on (pin transitions from high to low) and resets the counter to 0
@@ -117,10 +123,42 @@ void BrightnessController::ApplyBrightness(uint16_t rawBrightness) {
 }
 
 void BrightnessController::Set(BrightnessController::Levels level) {
+=======
+  static nrf_pwm_sequence_t seq;
+
+  seq.values.p_common = pwmSequence;
+  seq.length          = 1;
+  seq.repeats         = 0;
+  seq.end_delay       = 0;
+
+  uint32_t out_pins[] = {PinMap::LcdBacklightHigh, PinMap::LcdBacklightMedium, PinMap::LcdBacklightLow, NRF_PWM_PIN_NOT_CONNECTED};
+
+  nrf_pwm_pins_set(NRF_PWM0, out_pins);
+  nrf_pwm_enable(NRF_PWM0);
+  // With 8 MHz and 10000 reload timer PWM frequency is 712 Hz
+  nrf_pwm_configure(NRF_PWM0, NRF_PWM_CLK_8MHz, NRF_PWM_MODE_UP, 10000);
+  nrf_pwm_loop_set(NRF_PWM0, 0);
+  nrf_pwm_decoder_set(NRF_PWM0, NRF_PWM_LOAD_COMMON, NRF_PWM_STEP_AUTO);
+  nrf_pwm_sequence_set(NRF_PWM0, 0, &seq);
+  nrf_pwm_task_trigger(NRF_PWM0, NRF_PWM_TASK_SEQSTART0);
+
+  pwmVal = 0;
+
+  Set(level);
+}
+
+void BrightnessController::setPwm(uint16_t val) {
+  pwmSequence[0] = val;
+  nrf_pwm_task_trigger(NRF_PWM0, NRF_PWM_TASK_SEQSTART0);
+};
+
+uint16_t BrightnessController::getPwm(BrightnessController::Levels level) {
+>>>>>>> main
   this->level = level;
   switch (level) {
     default:
     case Levels::High:
+<<<<<<< HEAD
       ApplyBrightness(3 * timerPeriod);
       break;
     case Levels::Medium:
@@ -135,6 +173,31 @@ void BrightnessController::Set(BrightnessController::Levels level) {
     case Levels::Off:
       ApplyBrightness(0);
       break;
+=======
+      return 10000;
+    case Levels::Medium:
+      return 4000;
+    case Levels::Low:
+      return 900;
+    case Levels::Off:
+      return 0;
+  }
+}
+
+void BrightnessController::Set(BrightnessController::Levels level) {
+  this->level = level;
+  uint16_t target = getPwm(level);
+  uint16_t step = abs((pwmVal - target) / 10);
+
+  while (target != pwmVal) {
+    if (target > pwmVal) {
+      pwmVal += step;
+    } else {
+      pwmVal -= step;
+    }
+    setPwm(pwmVal);
+    vTaskDelay(20);
+>>>>>>> main
   }
 }
 

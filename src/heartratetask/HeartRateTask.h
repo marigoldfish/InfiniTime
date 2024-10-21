@@ -5,7 +5,11 @@
 #include <components/heartrate/Ppg.h>
 #include "components/settings/Settings.h"
 
+<<<<<<< HEAD
 #define DURATION_UNTIL_BACKGROUND_MEASUREMENT_IS_STOPPED pdMS_TO_TICKS(30 * 1000)
+=======
+#define DURATION_UNTIL_BACKGROUND_MEASURMENT_IS_STOPPED pdMS_TO_TICKS(30 * 1000)
+>>>>>>> main
 
 namespace Pinetime {
   namespace Drivers {
@@ -19,6 +23,7 @@ namespace Pinetime {
   namespace Applications {
     class HeartRateTask {
     public:
+<<<<<<< HEAD
       enum class Messages : uint8_t {
         GoToSleep,
         WakeUp,
@@ -33,6 +38,10 @@ namespace Pinetime {
         ScreenOffAndWaiting,
         ScreenOffAndMeasuring
       };
+=======
+      enum class Messages : uint8_t { GoToSleep, WakeUp, StartMeasurement, StopMeasurement };
+      enum class States { Idle, Running, Measuring, BackgroundWaiting, BackgroundMeasuring };
+>>>>>>> main
 
       explicit HeartRateTask(Drivers::Hrs3300& heartRateSensor,
                              Controllers::HeartRateController& controller,
@@ -45,6 +54,15 @@ namespace Pinetime {
       static void Process(void* instance);
       void StartMeasurement();
       void StopMeasurement();
+      void StartWaiting();
+
+      void HandleBackgroundWaiting();
+      void HandleSensorData(int* lastBpm);
+      TickType_t CurrentTaskDelay();
+
+      TickType_t GetHeartRateBackgroundMeasurementIntervalInTicks();
+      bool IsContinuosModeActivated();
+      bool IsBackgroundMeasurementActivated();
 
       void HandleGoToSleep();
       void HandleWakeUp();
@@ -69,6 +87,10 @@ namespace Pinetime {
       Controllers::HeartRateController& controller;
       Controllers::Settings& settings;
       Controllers::Ppg ppg;
+<<<<<<< HEAD
+=======
+      TickType_t backgroundWaitingStart = 0;
+>>>>>>> main
       TickType_t measurementStart = 0;
     };
 

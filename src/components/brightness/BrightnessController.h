@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <cmath>
+#include <FreeRTOS.h>
+#include <task.h>
 
 #include "nrf_ppi.h"
 #include "nrfx_gpiote.h"
@@ -23,6 +26,7 @@ namespace Pinetime {
 
     private:
       Levels level = Levels::High;
+<<<<<<< HEAD
       static constexpr uint8_t UNSET = UINT8_MAX;
       uint8_t lastPin = UNSET;
       // Maximum time (μs) it takes for the RTC to fully stop
@@ -42,6 +46,12 @@ namespace Pinetime {
       static constexpr nrf_ppi_channel_t ppiBacklightOff = NRF_PPI_CHANNEL2;
 
       void ApplyBrightness(uint16_t val);
+=======
+      uint16_t pwmVal;
+      uint16_t getPwm(Levels level);
+      void setPwm(uint16_t val);
+      uint16_t pwmSequence[1] = {10000};
+>>>>>>> main
     };
   }
 }

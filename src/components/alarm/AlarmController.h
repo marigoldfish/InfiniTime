@@ -65,6 +65,7 @@ namespace Pinetime {
       void SetRecurrence(RecurType recurrence);
 
     private:
+<<<<<<< HEAD
       // Versions 255 is reserved for now, so the version field can be made
       // bigger, should it ever be needed.
       static constexpr uint8_t alarmFormatVersion = 1;
@@ -79,16 +80,26 @@ namespace Pinetime {
 
       bool isAlerting = false;
       bool alarmChanged = false;
+=======
+      std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> CalculateAlarmTimePoint() const;
+>>>>>>> main
 
       Controllers::DateTime& dateTimeController;
       Controllers::FS& fs;
       System::SystemTask* systemTask = nullptr;
       TimerHandle_t alarmTimer;
+<<<<<<< HEAD
       AlarmSettings alarm;
       std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> alarmTime;
 
       void LoadSettingsFromFile();
       void SaveSettingsToFile() const;
+=======
+      uint8_t hours = 7;
+      uint8_t minutes = 0;
+      AlarmState state = AlarmState::Not_Set;
+      RecurType recurrence = RecurType::None;
+>>>>>>> main
     };
   }
 }
